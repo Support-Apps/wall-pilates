@@ -16,8 +16,8 @@ header p { color: #888; font-size: 1.1rem; }
 .stat { background: white; padding: 15px 30px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(232,164,184,0.15); }
 .stat-value { font-size: 1.8rem; font-weight: 700; color: #E8A4B8; }
 .stat-label { font-size: 0.85rem; color: #888; }
-.categories { display: flex; justify-content: center; gap: 10px; margin: 30px 0; flex-wrap: wrap; }
-.category-btn { background: white; border: 2px solid #F0F0F0; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-family: inherit; font-size: 1rem; transition: all 0.3s; }
+.categories { display: flex; justify-content: center; gap: 8px; margin: 30px 0; flex-wrap: nowrap; overflow-x: auto; padding: 5px; }
+.category-btn { background: white; border: 2px solid #F0F0F0; padding: 10px 16px; border-radius: 25px; white-space: nowrap; cursor: pointer; font-family: inherit; font-size: 1rem; transition: all 0.3s; }
 .category-btn:hover { border-color: #E8A4B8; }
 .category-btn.active { background: #E8A4B8; color: white; border-color: #E8A4B8; }
 .exercises-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; margin-top: 30px; }
