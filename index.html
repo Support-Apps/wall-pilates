@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פילאטיס קיר - גוף שעון חול</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', sans-serif; background: linear-gradient(135deg, #FFF5F7 0%, #FFF0F3 100%); min-height: 100vh; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+header { text-align: center; padding: 30px 0; }
+header h1 { font-size: 2.5rem; color: #E8A4B8; margin-bottom: 10px; }
+header p { color: #888; font-size: 1.1rem; }
+.stats-bar { display: flex; justify-content: center; gap: 40px; margin: 20px 0; flex-wrap: wrap; }
+.stat { background: white; padding: 15px 30px; border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(232,164,184,0.15); }
+.stat-value { font-size: 1.8rem; font-weight: 700; color: #E8A4B8; }
+.stat-label { font-size: 0.85rem; color: #888; }
+.categories { display: flex; justify-content: center; gap: 10px; margin: 30px 0; flex-wrap: wrap; }
+.category-btn { background: white; border: 2px solid #F0F0F0; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-family: inherit; font-size: 1rem; transition: all 0.3s; }
+.category-btn:hover { border-color: #E8A4B8; }
+.category-btn.active { background: #E8A4B8; color: white; border-color: #E8A4B8; }
+.exercises-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; margin-top: 30px; }
+.exercise-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: all 0.3s; }
+.exercise-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(232,164,184,0.25); }
+.exercise-card.completed { opacity: 0.7; border: 3px solid #E8A4B8; }
+.exercise-header { background: linear-gradient(135deg, #E8A4B8 0%, #F4C2D0 100%); padding: 20px; display: flex; align-items: center; gap: 15px; }
+.exercise-icon { font-size: 3rem; background: white; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.exercise-header-text { color: white; }
+.exercise-header-text h3 { font-size: 1.3rem; margin-bottom: 5px; }
+.exercise-header-text span { font-size: 0.9rem; opacity: 0.9; }
+.exercise-content { padding: 20px; }
+.exercise-steps { background: #FAFAFA; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+.exercise-steps h4 { color: #E8A4B8; font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.exercise-steps ol { padding-right: 20px; color: #555; font-size: 0.9rem; line-height: 1.8; }
+.exercise-steps li { margin-bottom: 5px; }
+.exercise-focus { background: #FFF0F5; border-radius: 10px; padding: 12px 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+.exercise-focus-icon { font-size: 1.5rem; }
+.exercise-focus-text { font-size: 0.9rem; color: #E8A4B8; font-weight: 500; }
+.exercise-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+.meta-tag { background: #F8F8F8; padding: 8px 14px; border-radius: 10px; font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 5px; }
+.exercise-tip { background: linear-gradient(135deg, #FFF9FA 0%, #FFF0F5 100%); padding: 12px 15px; border-radius: 10px; font-size: 0.9rem; color: #C77D8E; margin-bottom: 15px; border-right: 4px solid #E8A4B8; }
+.start-btn { width: 100%; background: #E8A4B8; border: none; padding: 14px; border-radius: 12px; color: white; font-size: 1.05rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s; }
+.start-btn:hover { background: #D899AD; transform: scale(1.02); }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+.modal.active { display: flex; }
+.modal-content { background: white; border-radius: 25px; padding: 30px; max-width: 500px; width: 90%; text-align: center; max-height: 90vh; overflow-y: auto; }
+.timer-display { font-size: 4rem; font-weight: 700; color: #E8A4B8; margin: 20px 0; }
+.timer-exercise-name { font-size: 1.5rem; color: #333; margin-bottom: 10px; }
+.timer-icon { font-size: 2.5rem; margin-bottom: 10px; }
+.timer-steps { background: #FFF5F7; border-radius: 12px; padding: 12px; margin: 10px 0; text-align: right; font-size: 0.85rem; color: #666; line-height: 1.6; max-height: 180px; overflow-y: auto; }
+.timer-buttons { display: flex; gap: 15px; justify-content: center; margin-top: 25px; }
+.timer-btn { padding: 14px 32px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+.timer-btn.primary { background: #E8A4B8; color: white; }
+.timer-btn.secondary { background: #F0F0F0; color: #666; }
+.congrats { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 50px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); z-index: 1001; text-align: center; }
+.congrats.active { display: block; animation: popIn 0.4s ease; }
+@keyframes popIn { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+.congrats-emoji { font-size: 4rem; margin-bottom: 15px; }
+.congrats h3 { color: #E8A4B8; font-size: 1.8rem; margin-bottom: 10px; }
+.progress-bar { background: #F0F0F0; height: 10px; border-radius: 5px; margin: 25px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #E8A4B8, #F4C2D0); border-radius: 5px; transition: width 0.5s; }
+.reset-btn { background: #E8A4B8; border: none; padding: 12px 25px; border-radius: 12px; color: white; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 1rem; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div style="position: fixed; top: 10px; right: 15px; font-size: 0.9rem; color: #E8A4B8; z-index: 9999;">בס"ד</div>
+<div class="container">
+  <header>
+    <h1>🧘‍♀️ פילאטיס קיר</h1>
+    <p>עיצוב גוף שעון חול • חיזוק • גמישות</p>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-value" id="completedCount">0</div>
+      <div class="stat-label">תרגילים הושלמו</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="caloriesCount">0</div>
+      <div class="stat-label">🔥 קלוריות</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="progressPercent">0%</div>
+      <div class="stat-label">התקדמות</div>
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+  </div>
+
+  <div class="categories">
+    <button class="category-btn active" onclick="filterCategory('all')">🌟 הכל</button>
+    <button class="category-btn" onclick="filterCategory('waist')">✨ מותניים</button>
+    <button class="category-btn" onclick="filterCategory('glutes')">🍑 ישבן</button>
+    <button class="category-btn" onclick="filterCategory('thighs')">💫 ירכיים</button>
+    <button class="category-btn" onclick="filterCategory('arms')">💪 זרועות</button>
+  </div>
+
+  <div class="exercises-grid" id="exercisesGrid"></div>
+  
+  <div style="text-align: center; margin-top: 30px;">
+    <button class="reset-btn" onclick="resetWorkout()">🔄 איפוס אימון</button>
+  </div>
+</div>
+
+<div class="modal" id="timerModal">
+  <div class="modal-content">
+    <div class="timer-icon" id="timerIcon">🧘‍♀️</div>
+    <div class="timer-exercise-name" id="timerExerciseName"></div>
+    <div class="timer-display" id="timerDisplay">0:45</div>
+    <div class="timer-steps" id="timerSteps"></div>
+    <div class="timer-buttons">
+      <button class="timer-btn primary" id="timerToggleBtn" onclick="toggleTimer()">▶️ התחלה</button>
+      <button class="timer-btn secondary" onclick="closeTimer()">✕ סגירה</button>
+    </div>
+  </div>
+</div>
+
+<div class="congrats" id="congrats">
+  <div class="congrats-emoji">🎉</div>
+  <h3>כל הכבוד!</h3>
+  <p>סיימת את התרגיל בהצלחה!</p>
+</div>
+
+<script>
+var exercises = [
+  {
+    id: 1,
+    name: "לחיצת קיר עם הרמת רגל",
+    category: "glutes",
+    icon: "🍑",
+    focusArea: "ישבן וירך אחורית",
+    steps: [
+      "עמדי מול הקיר במרחק זרוע",
+      "הניחי את שתי כפות הידיים על הקיר בגובה הכתפיים",
+      "העבירי את המשקל לרגל אחת",
+      "הרימי את הרגל השנייה לאחור, ישרה",
+      "כווצי את הישבן בשיא ההרמה",
+      "החזיקי 2 שניות והורידי באיטיות",
+      "חזרי 15 פעמים והחליפי רגל"
+    ],
+    duration: 45,
+    reps: "15 לכל רגל",
+    calories: 25,
+    tip: "שמרי על הגב ישר לאורך כל התרגיל, אל תקמרי את הגב"
+  },
+  {
+    id: 2,
+    name: "סקוואט קיר",
+    category: "thighs",
+    icon: "🦵",
+    focusArea: "ירכיים קדמיות וישבן",
+    steps: [
+      "עמדי עם הגב צמוד לקיר",
+      "הרחיקי את הרגליים כ-50 ס\"מ מהקיר",
+      "רוחב רגליים כרוחב הכתפיים",
+      "החליקי עם הגב למטה לאורך הקיר",
+      "עצרי כשהברכיים בזווית 90 מעלות",
+      "החזיקי בתנוחה למשך 30 שניות",
+      "החליקי חזרה למעלה ונוחי 10 שניות"
+    ],
+    duration: 40,
+    reps: "3 סטים של 30 שניות",
+    calories: 35,
+    tip: "הברכיים לא עוברות את קצות האצבעות! אם כואב - עלי קצת למעלה"
+  },
+  {
+    id: 3,
+    name: "פלאנק צד עם קיר",
+    category: "waist",
+    icon: "✨",
+    focusArea: "מותניים ושרירי הצד",
+    steps: [
+      "שכבי על הצד על מזרן ליד הקיר",
+      "הניחי את שתי כפות הרגליים על הקיר",
+      "הישעני על המרפק (מתחת לכתף)",
+      "הרימי את האגן מהרצפה",
+      "צרי קו ישר מהראש ועד הרגליים",
+      "החזיקי 30 שניות",
+      "החליפי צד"
+    ],
+    duration: 35,
+    reps: "30 שניות לכל צד",
+    calories: 28,
+    tip: "כווצי את הבטן לאורך כל התרגיל, אל תתני לאגן לצנוח"
+  },
+  {
+    id: 4,
+    name: "הרמת רגליים לצד",
+    category: "thighs",
+    icon: "💫",
+    focusArea: "ירכיים חיצוניות ומותניים",
+    steps: [
+      "עמדי צד לקיר, במרחק זרוע",
+      "הניחי יד אחת על הקיר לשיווי משקל",
+      "היד השנייה על המותן",
+      "הרימי את הרגל החיצונית לצד",
+      "הרגל ישרה, אצבעות פונות קדימה",
+      "הרימי כמה שאפשר בלי להטות את הגוף",
+      "הורידי באיטיות, 20 חזרות והחליפי צד"
+    ],
+    duration: 45,
+    reps: "20 לכל רגל",
+    calories: 30,
+    tip: "הגוף נשאר ישר וזקוף! רק הרגל זזה, לא כל הגוף"
+  },
+  {
+    id: 5,
+    name: "גשר עם רגליים על הקיר",
+    category: "glutes",
+    icon: "🍑",
+    focusArea: "ישבן וירך אחורית",
+    steps: [
+      "שכבי על הגב על מזרן מול הקיר",
+      "הניחי את כפות הרגליים על הקיר",
+      "הברכיים בזווית 90 מעלות",
+      "הידיים לצד הגוף, כפות כלפי מטה",
+      "הרימי את האגן מהרצפה",
+      "סחטי את הישבן בחוזקה למעלה",
+      "החזיקי 3 שניות והורידי באיטיות"
+    ],
+    duration: 40,
+    reps: "15 חזרות",
+    calories: 32,
+    tip: "דחפי דרך העקבים, לא דרך אצבעות הרגליים"
+  },
+  {
+    id: 6,
+    name: "סיבובי מותניים",
+    category: "waist",
+    icon: "✨",
+    focusArea: "מותניים וגמישות",
+    steps: [
+      "עמדי מול הקיר במרחק זרוע",
+      "הניחי את שתי הידיים על הקיר",
+      "רגליים ברוחב כתפיים",
+      "שמרי על הידיים והכתפיים קבועות",
+      "סובבי את האגן ימינה",
+      "חזרי למרכז וסובבי שמאלה",
+      "המשיכי לסירוגין 20 סיבובים"
+    ],
+    duration: 45,
+    reps: "20 סיבובים",
+    calories: 25,
+    tip: "רק האגן והרגליים זזים, פלג הגוף העליון נשאר קבוע"
+  },
+  {
+    id: 7,
+    name: "שכיבות סמיכה על הקיר",
+    category: "arms",
+    icon: "💪",
+    focusArea: "זרועות וחזה",
+    steps: [
+      "עמדי מול הקיר במרחק כ-60 ס\"מ",
+      "הניחי כפות ידיים על הקיר ברוחב כתפיים",
+      "גוף בקו ישר מהראש ועד העקבים",
+      "כפפי את המרפקים והתקרבי לקיר",
+      "האף כמעט נוגע בקיר",
+      "דחפי חזרה ויישרי את הידיים",
+      "חזרי 15 פעמים"
+    ],
+    duration: 40,
+    reps: "15 חזרות",
+    calories: 22,
+    tip: "ככל שתעמדי רחוק יותר מהקיר, התרגיל יהיה קשה יותר"
+  },
+  {
+    id: 8,
+    name: "מתיחת חזה",
+    category: "arms",
+    icon: "🌸",
+    focusArea: "חזה וכתפיים",
+    steps: [
+      "עמדי צד לקיר",
+      "הניחי את כף היד על הקיר בגובה הכתף",
+      "הזרוע ישרה ומקבילה לרצפה",
+      "סובבי את הגוף לכיוון ההפוך מהקיר",
+      "הרגישי את המתיחה בחזה ובכתף",
+      "החזיקי 30 שניות",
+      "החליפי צד"
+    ],
+    duration: 30,
+    reps: "30 שניות לכל צד",
+    calories: 15,
+    tip: "נשמי עמוק והרפי את הכתפיים, אל תעלי אותן לאוזניים"
+  },
+  {
+    id: 9,
+    name: "הרמת עקבים",
+    category: "thighs",
+    icon: "💫",
+    focusArea: "שוקיים ויציבות",
+    steps: [
+      "עמדי מול הקיר במרחק זרוע",
+      "הניחי את קצות האצבעות על הקיר לשיווי משקל",
+      "רגליים צמודות או ברוחב כתפיים",
+      "הרימי את העקבים מהרצפה",
+      "עלי על קצות האצבעות כמה שאפשר גבוה",
+      "החזיקי 2 שניות למעלה",
+      "הורידי באיטיות ומבוקר"
+    ],
+    duration: 45,
+    reps: "25 חזרות",
+    calories: 20,
+    tip: "עלי לאט וירדי לאט - המפתח הוא בשליטה, לא במהירות"
+  },
+  {
+    id: 10,
+    name: "לאנג' עם קיר",
+    category: "glutes",
+    icon: "🍑",
+    focusArea: "ישבן וירכיים",
+    steps: [
+      "עמדי עם הגב לקיר במרחק צעד",
+      "הניחי את גב כף הרגל על הקיר מאחור",
+      "הרגל הקדמית יציבה על הרצפה",
+      "כפפי את הברך הקדמית ושקעי למטה",
+      "הברך האחורית יורדת לכיוון הרצפה",
+      "דחפי חזרה למעלה דרך העקב הקדמי",
+      "12 חזרות והחליפי רגל"
+    ],
+    duration: 50,
+    reps: "12 לכל רגל",
+    calories: 38,
+    tip: "הברך הקדמית לא עוברת את אצבעות הרגל! שמרי על זווית 90 מעלות"
+  },
+  {
+    id: 11,
+    name: "כיפוף צד",
+    category: "waist",
+    icon: "✨",
+    focusArea: "מותניים צדדיות",
+    steps: [
+      "עמדי צד לקיר במרחק זרוע",
+      "הניחי יד אחת על הקיר לתמיכה",
+      "היד השנייה מורמת מעל הראש",
+      "כפפי את הגוף לצד הקיר",
+      "הרגישי את המתיחה בצד החיצוני",
+      "חזרי לאמצע",
+      "15 חזרות והחליפי צד"
+    ],
+    duration: 40,
+    reps: "15 לכל צד",
+    calories: 22,
+    tip: "הכיפוף הוא הצידה בלבד - לא קדימה ולא אחורה"
+  },
+  {
+    id: 12,
+    name: "סקוואט סומו",
+    category: "thighs",
+    icon: "🦵",
+    focusArea: "ירכיים פנימיות וישבן",
+    steps: [
+      "עמדי עם הגב צמוד לקיר",
+      "רגליים רחבות מאוד - רחוק מרוחב כתפיים",
+      "אצבעות הרגליים פונות כלפי חוץ (45 מעלות)",
+      "החליקי למטה לאורך הקיר",
+      "הברכיים נפתחות לצדדים מעל האצבעות",
+      "החזיקי למטה 3 שניות",
+      "דחפי חזרה למעלה"
+    ],
+    duration: 45,
+    reps: "15 חזרות",
+    calories: 35,
+    tip: "דחפי את הברכיים החוצה! הן לא קורסות פנימה"
+  }
+];
+
+var completedExercises = [];
+var totalCalories = 0;
+var currentCategory = "all";
+var timerInterval = null;
+var currentExercise = null;
+var timeRemaining = 0;
+var isTimerRunning = false;
+
+function renderExercises() {
+  var grid = document.getElementById("exercisesGrid");
+  var filtered = currentCategory === "all" ? exercises : exercises.filter(function(e) { return e.category === currentCategory; });
+  
+  var html = "";
+  for (var i = 0; i < filtered.length; i++) {
+    var ex = filtered[i];
+    var isCompleted = completedExercises.indexOf(ex.id) !== -1;
+    
+    html += '<div class="exercise-card' + (isCompleted ? ' completed' : '') + '">';
+    
+    // Header
+    html += '<div class="exercise-header">';
+    html += '<div class="exercise-icon">' + ex.icon + '</div>';
+    html += '<div class="exercise-header-text">';
+    html += '<h3>' + ex.name + (isCompleted ? ' ✓' : '') + '</h3>';
+    html += '<span>' + ex.focusArea + '</span>';
+    html += '</div></div>';
+    
+    // Content
+    html += '<div class="exercise-content">';
+    
+    // Steps
+    html += '<div class="exercise-steps">';
+    html += '<h4>📋 איך לבצע:</h4>';
+    html += '<ol>';
+    for (var j = 0; j < ex.steps.length; j++) {
+      html += '<li>' + ex.steps[j] + '</li>';
+    }
+    html += '</ol></div>';
+    
+    // Focus area
+    html += '<div class="exercise-focus">';
+    html += '<div class="exercise-focus-icon">🎯</div>';
+    html += '<div class="exercise-focus-text">אזור מטרה: ' + ex.focusArea + '</div>';
+    html += '</div>';
+    
+    // Meta tags
+    html += '<div class="exercise-meta">';
+    html += '<span class="meta-tag">⏱️ ' + ex.duration + ' שניות</span>';
+    html += '<span class="meta-tag">🔄 ' + ex.reps + '</span>';
+    html += '<span class="meta-tag">🔥 ' + ex.calories + ' קל׳</span>';
+    html += '</div>';
+    
+    // Tip
+    html += '<div class="exercise-tip">💡 ' + ex.tip + '</div>';
+    
+    // Button
+    html += '<button class="start-btn" onclick="openTimer(' + ex.id + ')">';
+    html += isCompleted ? '🔄 תרגלי שוב' : '▶️ התחילי';
+    html += '</button>';
+    
+    html += '</div></div>';
+  }
+  
+  grid.innerHTML = html;
+}
+
+function filterCategory(category) {
+  currentCategory = category;
+  var buttons = document.querySelectorAll(".category-btn");
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].classList.remove("active");
+  }
+  event.target.classList.add("active");
+  renderExercises();
+}
+
+function openTimer(exerciseId) {
+  for (var i = 0; i < exercises.length; i++) {
+    if (exercises[i].id === exerciseId) {
+      currentExercise = exercises[i];
+      break;
+    }
+  }
+  timeRemaining = currentExercise.duration;
+  isTimerRunning = false;
+  
+  document.getElementById("timerExerciseName").textContent = currentExercise.name;
+  document.getElementById("timerIcon").textContent = currentExercise.icon;
+  document.getElementById("timerDisplay").textContent = formatTime(timeRemaining);
+  document.getElementById("timerToggleBtn").textContent = "▶️ התחלה";
+  
+  // Show steps in timer
+  var stepsHtml = "<strong>📋 שלבים:</strong><br>";
+  for (var i = 0; i < currentExercise.steps.length; i++) {
+    stepsHtml += (i + 1) + ". " + currentExercise.steps[i] + "<br>";
+  }
+  document.getElementById("timerSteps").innerHTML = stepsHtml;
+  
+  document.getElementById("timerModal").classList.add("active");
+}
+
+function closeTimer() {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  document.getElementById("timerModal").classList.remove("active");
+}
+
+function toggleTimer() {
+  if (isTimerRunning) {
+    clearInterval(timerInterval);
+    document.getElementById("timerToggleBtn").textContent = "▶️ המשך";
+    isTimerRunning = false;
+  } else {
+    isTimerRunning = true;
+    document.getElementById("timerToggleBtn").textContent = "⏸️ השהיה";
+    timerInterval = setInterval(function() {
+      timeRemaining--;
+      document.getElementById("timerDisplay").textContent = formatTime(timeRemaining);
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        completeExercise();
+      }
+    }, 1000);
+  }
+}
+
+function completeExercise() {
+  if (completedExercises.indexOf(currentExercise.id) === -1) {
+    completedExercises.push(currentExercise.id);
+    totalCalories += currentExercise.calories;
+  }
+  
+  closeTimer();
+  updateStats();
+  renderExercises();
+  
+  document.getElementById("congrats").classList.add("active");
+  setTimeout(function() {
+    document.getElementById("congrats").classList.remove("active");
+  }, 2000);
+}
+
+function updateStats() {
+  var progress = Math.round((completedExercises.length / exercises.length) * 100);
+  document.getElementById("completedCount").textContent = completedExercises.length;
+  document.getElementById("caloriesCount").textContent = totalCalories;
+  document.getElementById("progressPercent").textContent = progress + "%";
+  document.getElementById("progressBar").style.width = progress + "%";
+}
+
+function resetWorkout() {
+  completedExercises = [];
+  totalCalories = 0;
+  updateStats();
+  renderExercises();
+}
+
+function formatTime(seconds) {
+  var mins = Math.floor(seconds / 60);
+  var secs = seconds % 60;
+  return mins + ":" + (secs < 10 ? "0" : "") + secs;
+}
+
+renderExercises();
+</script>
+</body>
+</html>
